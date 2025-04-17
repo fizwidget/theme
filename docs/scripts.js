@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const hdmiFilterCheckbox = document.getElementById('hdmi-filter');
     const gridFilterCheckbox = document.getElementById('grid-filter');
     const languageFilterCheckbox = document.getElementById('language-filter');
-    const portfolioItems = document.querySelectorAll('.portfolio-item');
+    const randomiseButton = document.getElementById('randomiser');
+    const portfolioItemsContainer = document.querySelector('.portfolio');
 
     // Updates the UI to reflect the URL query params
     function updateUI() {
@@ -25,9 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.style.setProperty('--primary-color', color);
 
         // Show or hide portfolio items
-        portfolioItems.forEach(item => {
+        for (item of portfolioItemsContainer.children) {
             // E.g. "RG35XX RG40XX HDMI Grid"
-            const categories = item.getAttribute('data-category').split(' ');
+            const categories = item.firstElementChild.getAttribute('data-category').split(' ');
             
             const isMatchingDeviceFilter = deviceFilter === 'all' || categories.includes(deviceFilter);
             const isMatchingHdmiFilter = !isHdmiFilterEnabled || categories.includes('HDMI');
@@ -41,12 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 isMatchingLanguageFilter;
             
             // Only show items that match all filters
-            const parentItem = item.closest('a');
-            parentItem.style.display = isMatchingAllFilters ? 'block' : 'none';
-        });
+            item.style.display = isMatchingAllFilters ? 'block' : 'none';
+        };
     }
 
-    // Update URL & UI when filters are changed
+    // Update URL & UI when user interactions occur
     deviceFilterMenu.addEventListener('change', function() {
         setQueryParam(queryParams.device, this.value);
         updateUI();
@@ -62,6 +62,12 @@ document.addEventListener('DOMContentLoaded', function() {
     languageFilterCheckbox.addEventListener('change', function() {
         setQueryParam(queryParams.language, this.checked);
         updateUI();
+    });
+    randomiseButton.addEventListener('click', function() {
+        const items = Array.from(portfolioItemsContainer.children);
+        const shuffledItems = items.sort(() => Math.random() - 0.5);
+        portfolioItemsContainer.innerHTML = '';
+        shuffledItems.forEach(item => portfolioItemsContainer.appendChild(item));
     });
 
     // Update UI on initial page load
